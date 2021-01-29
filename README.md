@@ -87,7 +87,7 @@ execute_once=(
 Isn't that neat!
 
 ### Auto login in `tty1`
-This is an optional highly opinionated setting. I don't like to put in the password every single time I start my computer. And there's no security risk with disabling it *for me*. My friends are windows users, (Yes **users**, not *normies* or *plebs*. Stop it with the damn evangelism, linux users! Ugh) so there is literally no risk there. The window manager I use (DWM) will prevent them from getting access to my stuff (memes and vim plugins lol). Therefore I have literally no use for the authentication at the `tty1`. Therefore I put this in as an *option*.
+This is an optional and highly opinionated setting. I don't like to put in the password every single time I start my computer. And there's no security risk with disabling it *for me*. My friends are windows users, (Yes **users**, not *normies* or *plebs*. Stop it with the damn evangelism, linux users! Ugh) so there is literally no risk there. The window manager I use (DWM) will prevent them from getting access to my stuff (memes and vim plugins lol). Therefore I have literally no use for the authentication at the `tty1`. Therefore I put this in as an *option*.
 
 ```sh
 # In case it isn't obvious, replace USERNAME with an actual user name
