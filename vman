@@ -1,0 +1,135 @@
+#!/bin/bash
+# NixOS like configuration file based system manager for Void Linux
+
+# Load the configuration file
+. $HOME/.config/config.void
+
+# Check if the authenticator is installed on the system
+which "$auth" >/dev/null || auth=sudo
+
+# Rebuild the system and manage packages
+rebuild() {
+  eval $auth xbps-install -y ${packages[@]} || exit 1
+
+  installed_pkgs=$(xbps-query -m | sed 's/\-[0-9].*$//g')
+  to_remove=()
+
+  # Find out the unneeded packages
+  for package in ${installed_pkgs[@]}; do
+
+    if [[ ! " ${packages[@]} " =~ " $package " ]]; then
+
+      # Some packages must not be removed
+      case "$package" in
+        "base-system") ;;
+        "grub"*) ;;
+        "sudo"*) ;;
+        *) to_remove+=( "$package" ) ;;
+      esac
+
+    fi
+
+  done
+
+  # Get rid of unneeded packages
+  [ ${#to_remove[@]} -gt 0 ] && {
+    eval $auth xbps-remove -Ry ${to_remove[@]} || exit 1
+  }
+
+  # Post rebuild execution hook
+  for i in "${execute[@]}"; do
+    $i || exit 1
+  done
+
+  # Setup optional auto login for user
+  if [ ! -z "$autologin" ]; then
+    getent passwd "$autologin" >/dev/null
+    $auth sed -i "s/GETTY_ARGS=.*$/GETTY_ARGS='--autologin $autologin'/g" /etc/sv/agetty-tty1/conf
+  fi
+
+  # Successful!
+  exit 0
+}
+
+# Build the system, meant to be used only ONCE
+build() {
+  if [ ! -z "$VOID_BUILT" ]; then
+    echo '[0;33mThe system is already built![0m'
+    echo 'Run `[0;32m'${0##*/}' rebuild[0m` or `[0;32m'${0##*/}'[0m` to rebuild the system.'
+
+    exit 1
+  else
+    rebuild
+
+    # Post initial install hooks
+    for i in "${execute_once[@]}"; do
+      $i
+    done
+  fi
+
+  exit 0
+}
+
+# Build void if not already built, else rebuild
+start() {
+  if [ -z "$VOID_BUILT" ]; then
+    $auth echo "export VOID_BUILT=yes" >> /etc/profile
+    build
+    reboot
+  else
+    rebuild
+  fi
+
+  exit 0
+}
+
+# Help
+help() {
+  blue='[34m'
+  yellow='[33m'
+  green='[32m'
+  normal='[0m'
+  progname="$(echo $0 | sed 's|.*/||g' | tr '[:lower:]' '[:upper:]')"
+
+  printf "$blue$progname$normal - NixOS inspired system management in Void Linux.\n
+${blue}SYNTAX$normal
+  ${green}${0##*/} ${yellow}OPTION$normal\n\n${blue}AVAILABLE OPTIONS$normal\n"
+
+  printf "  ${green}rebuild$normal Rebuild the system.
+   • Install the packages listed in ${yellow}'packages'$normal.
+   • Remove unlisted manually installed packages (${green}\`xbps-query --list-manual-pkgs\`$normal)
+   • Execute the commands listed in ${yellow}'execute'$normal.
+   • If ${yellow}'auth'$normal is a valid authenticator, use that as ${yellow}'\$auth'$normal.
+   • If ${yellow}'autologin'$normal is non-blank, autologin for that user in ${green}\`tty1\`$normal.\n\n"
+
+  printf "  ${green}build$normal Build the system, only to be used once.
+   • Run ${green}'rebuild'$normal.
+   • Execute the commands listed in ${yellow}'execute_once'$normal.
+   • Don't do anything if the system is already built.\n\n"
+
+  printf "  ${green}start$normal Build/rebuild the system. Depends on whether the system is already built.
+   • If the system is built, run ${green}'rebuild'$normal, else run ${green}'build'$normal.
+   • Same as running just ${green}\`${0##*/}\`$normal in the command line.\n\n"
+
+  printf "If no options are supplied, assume ${green}'start'$normal to be the option.\n"
+
+  exit 0
+}
+
+# Build/rebuild (depends) void if no arguments specified
+# If an arguments is supplied, do that action
+if [ -z $1 ]; then
+  start
+else
+  type=$(LC_ALL=C type -t $1 2>/dev/null)
+  if [ ! -z "$type" ] && [ "$type" = "function" ]; then
+    $1
+  else
+    printf "Unknown option [33m'$1'[0m
+    See [32m\`${0##*/} help\`[0m for more information.\n"
+
+    exit 127
+  fi
+
+  exit 0
+fi
