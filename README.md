@@ -112,7 +112,7 @@ So you decided to give void manager a try, cool. Here are the things you should 
 - Open the configuration file and read the comments if you feel unsure about something
 - Run `xbps-query -m` and go through the packages you have manually installed
 - Put the packages you want your system to have in your configuration file
-- BTW, no need to put in `grub` or `base-system` or `sudo` in your packages list
+- BTW, no need to put in `grub` or `base-system` in your packages list
 - Put the dotfiles symlinking and the system setup commands in the `execute_once` list
 - Run `vman` or `vman build` or `vman start` (It's recommended to use `vman` only)
 - Enjoy the fully-synced partially-declarative approach to system management

@@ -23,7 +23,6 @@ rebuild() {
       case "$package" in
         "base-system") ;;
         "grub"*) ;;
-        "sudo"*) ;;
         *) to_remove+=( "$package" ) ;;
       esac
 
