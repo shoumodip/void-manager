@@ -1,6 +1,17 @@
 #!/bin/bash
 # NixOS like configuration file based system manager for Void Linux
 
+# Default values
+packages=()
+
+execute () {
+  echo "The system has been rebuilt!"
+}
+
+execute_once () {
+  echo "The system has been built!"
+}
+
 # Load the configuration file
 . $HOME/.config/config.void
 
@@ -11,7 +22,7 @@ which "$auth" >/dev/null || auth=sudo
 rebuild() {
   eval $auth xbps-install -y ${packages[@]} || exit 1
 
-  installed_pkgs=$(xbps-query -m | sed 's/\-[0-9].*$//g')
+  installed_pkgs=$(xbps-query -m | sed 's/^\([^ ]*\)-.*/\1/')
   to_remove=()
 
   # Find out the unneeded packages
@@ -36,12 +47,12 @@ rebuild() {
   }
 
   # Post rebuild execution hook
-  for i in "${execute[@]}"; do
-    $i || exit 1
-  done
+  execute
 
   # Setup optional auto login for user
-  if [ ! -z "$autologin" ]; then
+  if [ -z "$autologin" ]; then
+    $auth sed -i "s/GETTY_ARGS=.*$/GETTY_ARGS=''/g" /etc/sv/agetty-tty1/conf
+  else
     getent passwd "$autologin" >/dev/null
     $auth sed -i "s/GETTY_ARGS=.*$/GETTY_ARGS='--autologin $autologin'/g" /etc/sv/agetty-tty1/conf
   fi
@@ -61,9 +72,7 @@ build() {
     rebuild
 
     # Post initial install hooks
-    for i in "${execute_once[@]}"; do
-      $i
-    done
+    execute_once
   fi
 
   exit 0
@@ -97,13 +106,13 @@ ${blue}SYNTAX$normal
   printf "  ${green}rebuild$normal Rebuild the system.
    • Install the packages listed in ${yellow}'packages'$normal.
    • Remove unlisted manually installed packages (${green}\`xbps-query --list-manual-pkgs\`$normal)
-   • Execute the commands listed in ${yellow}'execute'$normal.
+   • Run the ${yellow}'execute'$normal function.
    • If ${yellow}'auth'$normal is a valid authenticator, use that as ${yellow}'\$auth'$normal.
    • If ${yellow}'autologin'$normal is non-blank, autologin for that user in ${green}\`tty1\`$normal.\n\n"
 
   printf "  ${green}build$normal Build the system, only to be used once.
    • Run ${green}'rebuild'$normal.
-   • Execute the commands listed in ${yellow}'execute_once'$normal.
+   • Run the ${yellow}'execute_once'$normal function.
    • Don't do anything if the system is already built.\n\n"
 
   printf "  ${green}start$normal Build/rebuild the system. Depends on whether the system is already built.

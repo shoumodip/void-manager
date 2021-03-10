@@ -53,35 +53,35 @@ packages=(
 ```
 
 ### Post rebuild hook
-Every single time you rebuild your system using `vman` or `vman rebuild`, the commands listed here will get executed. So if you want a particular thing to happen every time you refresh your packages or whatever, you can do it!
+Every single time you rebuild your system using `vman` or `vman rebuild`, this function will get executed. So if you want a particular thing to happen every time you refresh your packages or whatever, you can do it!
 
 This can be really useful. For example let's say you want your dotfiles to be pushed into the remote git repository whenever you rebuild your system. With the rebuild hook you can make it happen.
 
 ```sh
-execute=(
-  "notify-send 'Void Manager' 'Your system has been put back in sync!'"
+execute () {
+  notify-send 'Void Manager' 'Your system has been put back in sync!'
 
   # Automatic dotfile syncing with git after each rebuild of void
-  "cd dotfiles && git add . && git commit -m 'Synced void' && git push -u origin main"
-)
+  cd dotfiles && git add . && git commit -m 'Synced void' && git push -u origin main
+}
 ```
 
 ### Post build hook
-Same as above but a little different. The commands listed here will be run only *once*, after your system has been built using void-manager for the first time. Place your dotfiles symlinking commands here, as they only need to happen once when your system is being setup. Think of this as the equivalent to the custom script you wrote.
+Same as above but a little different. This function will be run only *once*, after your system has been built using void-manager for the first time. Place your dotfiles symlinking commands here, as they only need to happen once when your system is being setup. Think of this as the equivalent to the custom script you wrote.
 
 ```sh
-execute_once=(
+execute_once () {
 
   # BTW, this is how you do authenticated operations, Use the `$auth` variable
-  "$auth ln -sf /etc/sv/dbus/ /var/service/"
+  $auth ln -sf /etc/sv/dbus/ /var/service/
 
   # The sweet sweet emoji support through your custom script or whatever
-  "patch-libxft"
+  patch-libxft
 
   # Dotfiles
-  "git clone https://www.github.com/USERNAME/dotfiles"
-  "ln -s dotfiles/* ~/"
-)
+  git clone https://www.github.com/USERNAME/dotfiles
+  ln -s dotfiles/* ~/
+}
 ```
 
 Isn't that neat!

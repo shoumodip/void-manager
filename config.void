@@ -1,44 +1,44 @@
-#!/bin/bash
-# Configuration management framework for Void linux
+#!/bin/sh
+# Configuration management system for Void linux
 
-# The root authenticator to use when rebuilding the system. By default this
-# will fallback to sudo
+# # The root authenticator to use when rebuilding the system. By default this
+# # will fallback to sudo
 
-auth=
+# auth=
 
-# The user to enable autologin in `tty1` for.
-# Make sure the username is valid. To disable this feature, make it blank
+# # The user to enable autologin in `tty1` for.
+# # Make sure the username is valid. To disable this feature, make it blank
 
-autologin=
+# autologin=
 
-# The list of packages you want installed on your system. On each run of `void
-# rebuild`, void will go through the packages in this list. If it finds a
-# non-installed package listed here, it will install it.
+# # The list of packages you want installed on your system. On each run of `void
+# # rebuild`, void will go through the packages in this list. If it finds a
+# # non-installed package listed here, it will install it.
 
-# After installing all the missing programs, it will go through all the
-# manually installed packages (`xbps-query -m`) and check if there are some
-# packages on your system which are not listed here. It will remove them if
-# such packages exist.
+# # After installing all the missing programs, it will go through all the
+# # manually installed packages (`xbps-query -m`) and check if there are some
+# # packages on your system which are not listed here. It will remove them if
+# # such packages exist.
 
-# The removal only works on manually installed packages, a.k.a packages you
-# explicitly told xbps to install or had listed here earlier. You do NOT need
-# to list all the dependencies of a package here. They came bundled with the
-# package you installed and hence are ignored by the removal mechanism. The
-# only thing that matters to the removal function is the main package which you
-# told xbps to install.
+# # The removal only works on manually installed packages, a.k.a packages you
+# # explicitly told xbps to install or had listed here earlier. You do NOT need
+# # to list all the dependencies of a package here. They came bundled with the
+# # package you installed and hence are ignored by the removal mechanism. The
+# # only thing that matters to the removal function is the main package which you
+# # told xbps to install.
 
 # See the -m flag of xbps-query for more information (`man xbps-query`)
 
-packages=()
+# packages=()
 
-# A list of commands to execute every single time the system is rebuilt. Think
-# of this like a shell script which will get executed at the end of each
-# rebuild
+# # A list of commands to execute every single time the system is rebuilt. Think
+# # of this like a shell script which will get executed at the end of each
+# # rebuild
 
-execute=()
+# execute () {}
 
-# Same as above, but with a little twist. The commands listed will get executed
-# after the system is built for the first time. A common example is to put in
-# the dotfile symlinking commands here
+# # Same as above, but with a little twist. The commands listed will get executed
+# # after the system is built for the first time. A common example is to put in
+# # the dotfile symlinking commands here
 
-execute_once=()
+# execute_once () {}
