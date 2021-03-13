@@ -3,6 +3,7 @@
 
 # Default values
 packages=()
+auth="sudo"
 
 execute () {
   echo "The system has been rebuilt!"
@@ -16,7 +17,7 @@ execute_once () {
 . $HOME/.config/config.void
 
 # Check if the authenticator is installed on the system
-which "$auth" >/dev/null || auth=sudo
+which "$auth" 2>/dev/null >/dev/null || auth=sudo
 
 # Rebuild the system and manage packages
 rebuild() {
@@ -56,37 +57,12 @@ rebuild() {
     getent passwd "$autologin" >/dev/null
     $auth sed -i "s/GETTY_ARGS=.*$/GETTY_ARGS='--autologin $autologin'/g" /etc/sv/agetty-tty1/conf
   fi
-
-  # Successful!
-  exit 0
 }
 
 # Build the system, meant to be used only ONCE
 build() {
-  if [ ! -z "$VOID_BUILT" ]; then
-    echo '[0;33mThe system is already built![0m'
-    echo 'Run `[0;32m'${0##*/}' rebuild[0m` or `[0;32m'${0##*/}'[0m` to rebuild the system.'
-
-    exit 1
-  else
-    rebuild
-
-    # Post initial install hooks
-    execute_once
-  fi
-
-  exit 0
-}
-
-# Build void if not already built, else rebuild
-start() {
-  if [ -z "$VOID_BUILT" ]; then
-    $auth echo "export VOID_BUILT=yes" >> /etc/profile
-    build
-    reboot
-  else
-    rebuild
-  fi
+  rebuild
+  execute_once
 
   exit 0
 }
@@ -115,11 +91,7 @@ ${blue}SYNTAX$normal
    • Run the ${yellow}'execute_once'$normal function.
    • Don't do anything if the system is already built.\n\n"
 
-  printf "  ${green}start$normal Build/rebuild the system. Depends on whether the system is already built.
-   • If the system is built, run ${green}'rebuild'$normal, else run ${green}'build'$normal.
-   • Same as running just ${green}\`${0##*/}\`$normal in the command line.\n\n"
-
-  printf "If no options are supplied, assume ${green}'start'$normal to be the option.\n"
+  printf "If no options are supplied, assume ${green}'rebuild'$normal to be the option.\n"
 
   exit 0
 }
@@ -127,7 +99,7 @@ ${blue}SYNTAX$normal
 # Build/rebuild (depends) void if no arguments specified
 # If an arguments is supplied, do that action
 if [ -z $1 ]; then
-  start
+  rebuild
 else
   type=$(LC_ALL=C type -t $1 2>/dev/null)
   if [ ! -z "$type" ] && [ "$type" = "function" ]; then

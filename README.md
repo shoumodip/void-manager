@@ -67,7 +67,7 @@ execute () {
 ```
 
 ### Post build hook
-Same as above but a little different. This function will be run only *once*, after your system has been built using void-manager for the first time. Place your dotfiles symlinking commands here, as they only need to happen once when your system is being setup. Think of this as the equivalent to the custom script you wrote.
+Same as above but a little different. This function will be executed when you run `void build`. Place your dotfiles symlinking commands here, as they only need to happen once when your system is being setup. Think of this as the equivalent to the custom script you wrote.
 
 ```sh
 execute_once () {
@@ -114,7 +114,7 @@ So you decided to give void manager a try, cool. Here are the things you should 
 - Put the packages you want your system to have in your configuration file
 - BTW, no need to put in `grub` or `base-system` in your packages list
 - Put the dotfiles symlinking and the system setup commands in the `execute_once` list
-- Run `vman` or `vman build` or `vman start` (It's recommended to use `vman` only)
+- Run `vman build`
 - Enjoy the fully-synced partially-declarative approach to system management
 
 ## License
