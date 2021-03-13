@@ -88,8 +88,7 @@ ${blue}SYNTAX$normal
 
   printf "  ${green}build$normal Build the system, only to be used once.
    • Run ${green}'rebuild'$normal.
-   • Run the ${yellow}'execute_once'$normal function.
-   • Don't do anything if the system is already built.\n\n"
+   • Run the ${yellow}'execute_once'$normal function.\n\n"
 
   printf "If no options are supplied, assume ${green}'rebuild'$normal to be the option.\n"
 
